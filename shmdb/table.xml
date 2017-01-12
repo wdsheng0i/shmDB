@@ -1,0 +1,10 @@
+<!-- 表名，表id一定要修改！！！！！！！！！！！！！！！！！ -->
+<table>
+	<table-name value="teacher"/>
+	<table-id value="1"/>
+	<primary-key value="sid"/>
+	<column name="sid" column-pos="0" data-type="number" data-len="50"/>
+	<column name="sname" column-pos="1" data-type="varchar" data-len="50"/>
+	<column name="sage" column-pos="2" data-type="number" data-len="50"/>
+	<column name="sclass" column-pos="3" data-type="varchar" data-len="50"/>
+</table>
