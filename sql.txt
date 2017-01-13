@@ -1,0 +1,96 @@
+	磁盘文件上的.xml文件是建表时读取的文件，修改xml内容后，create命令会建修改后的新表，但是要保证tableID的唯一性，修改xml内容后，不执行create命令不会读取xml文件内容无法建新表
+	有关表中数据大小在xml中可修改，内存/页的大小是固定的，只能在程序中修改	
+====说明：====
+   已实现：
+          现在只是实现了单一条件的增删改查
+          insert有主键唯一性检查
+		insert into student (sid =1 and sname =sasa and sage=1234 and sclass=wwww
+		select *from student where sid =1 
+		update student set sname=wdsheng where sid=1	
+		delete from student where sid=1
+          select条件可以是任意单一字段，查询结果是所有满足条件的记录（完全遍历待修改遍历表属空满链）
+          update 以主键查询修改任意单一字段（完全遍历==>待修改遍历表属空满链）
+          delete 以主键查询删除该条记录（先满链后空链）
+	  checkpoint进程扫描到有数据改动（insert/update/delete）的页后，把该页+第0页写进文件
+	  建表后写第0页/删除表后写（第0页+回收该表的每一页）
+   未实现：
+	  
+	  select* from student 
+	  多字段条件的增删改查，><~的sql语句
+	  drop一个表A后，新建一张表B,此时A用过的页归还shm可以使用，但是A用过的页内用过的块不能使用（drop student 时表信息区重置为0，表所属页除页号外 重置为0，但是页头信息区未重置（内有页号），该页内的空满偏移也未重置，偏所以当该页被重新使用时会造成之前用过的块被跳过，仍在满链上无法使用）
+	  链的转化还未测试
+	  几个展示函数还没完善
+	  删除链接/销毁内存
+=====测试====
+1.未建表时增删改查测试==>找不到表
+2.create==>建表
+3.增删改查测试
+4.重启进程==>读磁盘文件==>不再create==>查询原数据是否在，增删改查测试
+5.drop 表后再测一遍
+====链的转化还未测试====
+
+快捷测试sql
+create
+drop tablename
+show
+desc
+
+select *from teacher
+select *from school
+select *from student 
+select *from student where sid =1 
+select *from student where sname=sasa and sid=1
+select *from studentshow where sname=wdsheng
+select *from teacher where sid =4
+select *from teacher where sname=sasa
+select *from teacher where sname=sasa and sclass=qqqq
+select *from teacher where gz =1000
+
+update student set sname=wdsheng where sid=1
+update teacher set sname=wdsheng where sid=4
+update school set sname=wdsheng where sid=9
+update student set sname=wdsheng where sname=sasa
+update teacher set sname=wds where sage=1234
+
+delete from student where sid=1
+delete from teacher where sid=4
+delete from school where sid=7
+delete from student where sname=sasa
+
+insert into student (sid =1 and sname =sasa and sage=1234 and sclass=wwww
+insert into student (sid =2 and sname =sasa and sage=1234 and sclass=qqqq
+insert into student (sid =3 and sname =sbsb and sage=1111 and sclass=eeee
+
+insert into teacher (sid =4 and sname =sasa and sage=1234 and sclass=wwww
+insert into teacher (sid =5 and sname =sasa and sage=1234 and sclass=qqqq
+insert into teacher (sid =5 and sname =wds and sage=1234 and sclass=qqqq
+insert into teacher (sid =6 and sname =sbsb and sage=1111 and sclass=eeee
+
+insert into school (sid =7 and sname =sasa and sage=1234 and sclass=wwww aaa=111
+insert into school (sid =8 and sname =sasa and sage=1234 and sclass=qqqq aaa=222
+insert into school (sid =9 and sname =sbsb and sage=1111 and sclass=eeee aaa=333
+
+insert into student (sid =10 and sname =sasa and sage=1234 and sclass=wwww
+insert into student (sid =11 and sname =sasa and sage=1234 and sclass=qqqq
+insert into student (sid =12 and sname =sbsb and sage=1111 and sclass=eeee
+insert into student (sid =13 and sname =sasa and sage=1234 and sclass=wwww
+insert into student (sid =14 and sname =sasa and sage=1234 and sclass=qqqq
+insert into student (sid =15 and sname =sbsb and sage=1111 and sclass=eeee
+insert into student (sid =16 and sname =sasa and sage=1234 and sclass=wwww
+insert into student (sid =17 and sname =sasa and sage=1234 and sclass=qqqq
+insert into student (sid =18 and sname =sbsb and sage=1111 and sclass=eeee
+insert into student (sid =19 and sname =sasa and sage=1234 and sclass=wwww
+insert into student (sid =20 and sname =sasa and sage=1234 and sclass=qqqq
+insert into student (sid =21 and sname =sbsb and sage=1111 and sclass=eeee
+insert into student (sid =22 and sname =sbsb and sage=1111 and sclass=eeee
+
+insert into student (sid =23 and sname =sbsb and sage=1111 and sclass=eeee
+insert into student (sid =24 and sname =sasa and sage=1234 and sclass=qqqq
+insert into student (sid =25 and sname =sbsb and sage=1111 and sclass=eeee
+insert into student (sid =26 and sname =sasa and sage=1234 and sclass=qqqq
+
+
+
+
+
+
